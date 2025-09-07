@@ -8,10 +8,8 @@ filterwarnings('ignore')
 
 
 def streamlit_config():
-    # Page configuration
     st.set_page_config(page_title='Classification', layout='centered')
 
-    # Transparent header
     page_background_color = """
     <style>
     [data-testid="stHeader"] {
@@ -21,7 +19,6 @@ def streamlit_config():
     """
     st.markdown(page_background_color, unsafe_allow_html=True)
 
-    # Title
     st.markdown('<h1 style="text-align: center;">Potato Disease Classification</h1>', unsafe_allow_html=True)
     add_vertical_space(4)
 
@@ -31,34 +28,33 @@ streamlit_config()
 
 
 def prediction(uploaded_file, class_names=['Potato___Early_blight', 'Potato___Late_blight', 'Potato___healthy']):
-    # Validate file type
-    if not uploaded_file.name.lower().endswith(('.jpg', '.jpeg', '.png')):
-        st.error("Unsupported file type. Please upload a JPG or PNG image.")
+    # Debug info
+    st.write("📄 File name:", uploaded_file.name)
+    st.write("📦 File type:", uploaded_file.type)
+
+    # Validate MIME type
+    if uploaded_file.type not in ["image/jpeg", "image/png"]:
+        st.error("Unsupported file type. Please upload a valid JPG or PNG image.")
         return
 
     try:
-        # Try opening the image
         img = Image.open(uploaded_file).convert("RGB")
     except Exception:
-        st.error("Invalid image file. Please upload a valid JPG or PNG.")
+        st.error("Invalid image file. It may be corrupted or incomplete.")
         return
 
     try:
-        # Preprocess image
         img_resized = img.resize((256, 256))
         img_array = tf.keras.preprocessing.image.img_to_array(img_resized)
         img_array = np.expand_dims(img_array, axis=0)
         img_array = img_array / 255.0
 
-        # Load model
         model = tf.keras.models.load_model("model.keras")
 
-        # Predict
         prediction = model.predict(img_array)
         predicted_class = class_names[np.argmax(prediction)]
         confidence = round(np.max(prediction) * 100, 2)
 
-        # Display results
         add_vertical_space(1)
         st.markdown(
             f'<h4 style="color: orange;">Predicted Class : {predicted_class}<br>Confidence : {confidence}%</h4>',
@@ -76,7 +72,6 @@ col1, col2, col3 = st.columns([0.1, 0.9, 0.1])
 with col2:
     input_image = st.file_uploader(label='Upload the Image', type=['jpg', 'jpeg', 'png'])
 
-# Run prediction if image is uploaded
 if input_image is not None:
     with st.spinner("Classifying..."):
         prediction(input_image)
