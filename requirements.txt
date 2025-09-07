@@ -1,7 +1,6 @@
-tensorflow
-opencv-python
-pillow
-numpy
-matplotlib
 streamlit
-streamlit_extras
+tensorflow
+pillow
+streamlit-extras
+
+
