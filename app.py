@@ -32,8 +32,14 @@ streamlit_config()
 
 def prediction(uploaded_file, class_names=['Potato___Early_blight', 'Potato___Late_blight', 'Potato___healthy']):
     try:
-        # Load and preprocess image
+        # Validate and open image
         img = Image.open(uploaded_file).convert("RGB")
+    except Exception:
+        st.error("Invalid image file. Please upload a valid JPG or PNG.")
+        return
+
+    try:
+        # Preprocess image
         img_resized = img.resize((256, 256))
         img_array = tf.keras.preprocessing.image.img_to_array(img_resized)
         img_array = np.expand_dims(img_array, axis=0)
@@ -70,3 +76,4 @@ if input_image is not None:
     with st.spinner("Classifying..."):
         prediction(input_image)
     st.success("Prediction complete!")
+
