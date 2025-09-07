@@ -31,8 +31,13 @@ streamlit_config()
 
 
 def prediction(uploaded_file, class_names=['Potato___Early_blight', 'Potato___Late_blight', 'Potato___healthy']):
+    # Validate file type
+    if not uploaded_file.name.lower().endswith(('.jpg', '.jpeg', '.png')):
+        st.error("Unsupported file type. Please upload a JPG or PNG image.")
+        return
+
     try:
-        # Validate and open image
+        # Try opening the image
         img = Image.open(uploaded_file).convert("RGB")
     except Exception:
         st.error("Invalid image file. Please upload a valid JPG or PNG.")
@@ -76,4 +81,3 @@ if input_image is not None:
     with st.spinner("Classifying..."):
         prediction(input_image)
     st.success("Prediction complete!")
-
